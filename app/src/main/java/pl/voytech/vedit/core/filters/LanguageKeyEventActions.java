@@ -20,10 +20,10 @@ public class LanguageKeyEventActions extends AbstractKeyEventActions {
         this.langDef = langDef;
     }
     @Override
-    public void onNotConsumedKeyEvent(KeyEvent event, EditorBuffer buffer, Cursor cursor, EditorActions actions) {
+    public void onNotConsumedKeyEvent(KeyEvent event, EditorBuffer buffer, Cursor cursor) {
         for (LangTokenDef tdef : langDef.byGroup(LangTokenDef.TokenGroup.SEPARATOR)){
             if (tdef.getId().equals(""+((char)event.getUnicodeChar()))){
-                actions.execute(LangSeparatorAction.class,buffer,new Object[]{((char)event.getUnicodeChar())});
+                EditorActions.i().execute(LangSeparatorAction.class,buffer,new Object[]{((char)event.getUnicodeChar())});
                 setConsumed();
             }
         }

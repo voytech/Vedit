@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import pl.voytech.vedit.core.features.SpanningFeature;
 import pl.voytech.vedit.core.renderers.core.Renderable;
 
 /**
@@ -16,6 +17,35 @@ import pl.voytech.vedit.core.renderers.core.Renderable;
  */
 
 public class EditorBuffer implements Renderable,EditorApi {
+    public class Span{
+        private final Token start;
+        private final Token end;
+        public Span(Token start,Token end){
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        public boolean equals(Object other){
+            if (!Span.class.equals(other.getClass()))
+                return false;
+            Span otherSpan = (Span)other;
+            return (otherSpan.start.equals(this.start) && otherSpan.end.equals(this.end));
+        }
+
+        @Override
+        public int hashCode(){
+            return start.hashCode()+end.hashCode();
+        }
+
+        public Token getStart() {
+            return start;
+        }
+
+        public Token getEnd() {
+            return end;
+        }
+    }
     interface TokenListener {
         void ready(Token token);
     }
@@ -24,6 +54,7 @@ public class EditorBuffer implements Renderable,EditorApi {
     }
     private final Map<Integer,List<Token>> tokens = new HashMap<Integer,List<Token>>();
     private final Map<UUID,Token> tokensById = new HashMap<>();
+    private final Map<Span,List<SpanningFeature>> groupFeatures = new HashMap<>();
     private final EditorState state;
     private TokenListener listener;
     private final Comparator<Token> COLUMN_COMPARATOR = new Comparator<Token>() {
@@ -32,9 +63,26 @@ public class EditorBuffer implements Renderable,EditorApi {
             return token.getStartColumn() - t1.getStartColumn();
         }
     };
+
     public EditorBuffer(EditorState state) {
         this.state = state;
         ObjectCache.i().add(this);
+    }
+
+    public void spanFeature(Span span,SpanningFeature feature){
+        if (!groupFeatures.containsKey(span)){
+            groupFeatures.put(span,new ArrayList<SpanningFeature>());
+        }
+        groupFeatures.get(span).add(feature);
+        ObjectCache.i().add(feature);
+    }
+
+    public void extendSpan(Span oldSpan,Token newEnd){
+        if (groupFeatures.containsKey(oldSpan)){
+            List<SpanningFeature> features = groupFeatures.get(oldSpan);
+            groupFeatures.remove(oldSpan);
+            groupFeatures.put(new Span(oldSpan.start,newEnd),features);
+        }
     }
 
     public EditorState getState(){
@@ -68,6 +116,7 @@ public class EditorBuffer implements Renderable,EditorApi {
         ObjectCache.i().add(token);
         tokensById.put(token.getId(),token);
     }
+
     public Token newToken(){
         Token token = new Token(state.getCursor());
         add(token);

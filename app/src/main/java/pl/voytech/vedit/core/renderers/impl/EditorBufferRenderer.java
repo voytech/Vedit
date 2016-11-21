@@ -16,11 +16,6 @@ public class EditorBufferRenderer implements Renderer<EditorBuffer> {
 
     @Override
     public void render(final EditorBuffer renderable,final Canvas canvas, final EditorConfig config) {
-        /*renderable.allTokens(new EditorBuffer.TokenVisitor() {
-            @Override
-            public void visit(Token token,int index) {
-               RenderersRegistry.i().render(token,canvas,config);
-            }
-        });*/
+
     }
 }

@@ -1,7 +1,17 @@
 package pl.voytech.vedit.core.languages.rt;
 
+import android.app.Notification;
 import android.graphics.Color;
 
+import java.util.Arrays;
+
+import pl.voytech.vedit.core.Cursor;
+import pl.voytech.vedit.core.actions.ActionInvokation;
+import pl.voytech.vedit.core.actions.ActionInvokations;
+import pl.voytech.vedit.core.actions.CursorMoveAction;
+import pl.voytech.vedit.core.actions.EnterAction;
+import pl.voytech.vedit.core.actions.SpaceAction;
+import pl.voytech.vedit.core.actions.TokenAction;
 import pl.voytech.vedit.core.features.FeatureFactory;
 import pl.voytech.vedit.core.languages.definition.LangDef;
 import pl.voytech.vedit.core.languages.definition.LangTokenDef;
@@ -19,7 +29,14 @@ public class JavaLanguage {
     private void defineFeatures(){
         FeatureFactory.i().define("keyword-highlight",SyntaxHighlightFeature.class,Color.BLUE);
         FeatureFactory.i().define("separator-highlight",SyntaxHighlightFeature.class,Color.RED);
-        //FeatureFactory.i().define("braces-macro",MacroFeature.class,);
+        FeatureFactory.i().define("curly-brace-macro",
+                                  MacroFeature.class,
+                                  new ActionInvokations().add(new ActionInvokation(EnterAction.class))
+                                                         .add(new ActionInvokation(EnterAction.class))
+                                                         .add(new ActionInvokation(SpaceAction.class))
+                                                         .add(new ActionInvokation(TokenAction.class,"}"))
+                                                         .add(new ActionInvokation(CursorMoveAction.class, Cursor.Movements.PREV_ROW))
+                                  );
     }
 
     public LangDef definition(){
@@ -82,16 +99,16 @@ public class JavaLanguage {
         ////////////////////////////////////////////////////////////////////
         // Separators
         ////////////////////////////////////////////////////////////////////
-        def.addLangPart(createSeparator("[","\\[",new String[]{"",""}));
-        def.addLangPart(createSeparator("]","\\]",new String[]{"",""}));
-        def.addLangPart(createSeparator("(","\\(",new String[]{"",""}));
-        def.addLangPart(createSeparator(")","\\)",new String[]{"",""}));
-        def.addLangPart(createSeparator("{","\\{",new String[]{"",""}));
-        def.addLangPart(createSeparator("}","\\}",new String[]{"",""}));
-        def.addLangPart(createSeparator(";","\\;",new String[]{"",""}));
-        def.addLangPart(createSeparator(":","\\:",new String[]{"",""}));
-        def.addLangPart(createSeparator(",","\\,",new String[]{"",""}));
-        def.addLangPart(createSeparator(".","\\.",new String[]{"",""}));
+        def.addLangPart(createSeparator("[","\\[",new String[]{}));
+        def.addLangPart(createSeparator("]","\\]",new String[]{}));
+        def.addLangPart(createSeparator("(","\\(",new String[]{}));
+        def.addLangPart(createSeparator(")","\\)",new String[]{}));
+        def.addLangPart(withFeature(createSeparator("{","\\{",new String[]{}),"curly-brace-macro"));
+        def.addLangPart(createSeparator("}","\\}",new String[]{}));
+        def.addLangPart(createSeparator(";","\\;",new String[]{}));
+        def.addLangPart(createSeparator(":","\\:",new String[]{}));
+        def.addLangPart(createSeparator(",","\\,",new String[]{}));
+        def.addLangPart(createSeparator(".","\\.",new String[]{}));
         return def;
     }
     private LangTokenDef createKeyword(String keyword,String[] startsProductions){
@@ -109,6 +126,10 @@ public class JavaLanguage {
         separatorToken.setGroup(LangTokenDef.TokenGroup.SEPARATOR);
         javaLangFeatures.add(separatorToken,"separator-highlight");
         return separatorToken;
+    }
+    private LangTokenDef withFeature(LangTokenDef langTokenDef,String feature){
+        javaLangFeatures.add(langTokenDef,feature);
+        return langTokenDef;
     }
 
 }

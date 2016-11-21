@@ -9,10 +9,20 @@ import java.util.Map;
 
 public class EditorActions {
     private final Map<Class<EditorAction>,EditorAction> actions = new HashMap<>();
+    private static EditorActions instance;
+    private EditorActions(){}
+
+    public static EditorActions i(){
+        if (instance==null){
+            instance = new EditorActions();
+        }
+        return instance;
+    }
 
     public void addMapping(EditorAction action){
         actions.put((Class<EditorAction>) action.getClass(),action);
     }
+
     public void execute(Class<? extends EditorAction> clazz,EditorBuffer buffer,Object... args){
         EditorAction action = actions.get(clazz);
         if (action != null){

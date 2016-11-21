@@ -21,10 +21,5 @@ public class TokenRenderer implements Renderer<Token>{
         float x = renderable.getStartColumn()*config.getGlyphWidth();
         float y = renderable.getStartRow()*(config.getGlyphHeight()+config.getTopMargin());
         canvas.drawText(text,x,y+config.getTopMargin(),config.getPaint());
-        /*for (Feature feature : renderable.getFeatures()){
-            if (RenderersRegistry.i().get(feature) != null) {
-                RenderersRegistry.i().render(feature, canvas, config);
-            }
-        }*/
     }
 }

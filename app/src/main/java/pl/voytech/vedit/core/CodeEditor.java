@@ -17,6 +17,7 @@ import pl.voytech.vedit.core.actions.EnterAction;
 import pl.voytech.vedit.core.actions.LangAnalyzerAction;
 import pl.voytech.vedit.core.actions.LangSeparatorAction;
 import pl.voytech.vedit.core.actions.SpaceAction;
+import pl.voytech.vedit.core.actions.TokenAction;
 import pl.voytech.vedit.core.filters.DefaultKeyEventActions;
 import pl.voytech.vedit.core.filters.LanguageKeyEventActions;
 import pl.voytech.vedit.core.filters.LanguageParserFilter;
@@ -37,9 +38,8 @@ public class CodeEditor extends View {
     private final EditorConfig config = new EditorConfig();
     private final EditorState state = new EditorState(config);
     private final EditorBuffer buffer = new EditorBuffer(state);
-    private final EditorActions actions = new EditorActions();
     private final KeyEventActions keyEventMapping = new SpecialKeyEventActions();
-    private final TokenReader tokenBuilder = new TokenReader(buffer,actions,state,keyEventMapping);
+    private final TokenReader tokenBuilder = new TokenReader(buffer,state,keyEventMapping);
 
     public CodeEditor(Context context) {
         super(context);
@@ -81,15 +81,16 @@ public class CodeEditor extends View {
         config.setBackgroundColor(Color.BLACK);
         config.setBaseColor(Color.BLACK);
         config.setTopMargin(20);
-        actions.addMapping(new BackspaceAction());
-        actions.addMapping(new BuildTokenAction(langDef));
-        actions.addMapping(new EnterAction());
-        actions.addMapping(new CursorMoveAction());
-        actions.addMapping(new SpaceAction());
-        actions.addMapping(new LangSeparatorAction(langDef));
+        EditorActions.i().addMapping(new BackspaceAction());
+        EditorActions.i().addMapping(new BuildTokenAction(langDef));
+        EditorActions.i().addMapping(new EnterAction());
+        EditorActions.i().addMapping(new CursorMoveAction());
+        EditorActions.i().addMapping(new SpaceAction());
+        EditorActions.i().addMapping(new LangSeparatorAction(langDef));
+        EditorActions.i().addMapping(new TokenAction());
         LangAnalyzerAction analyzerAction = new LangAnalyzerAction();
         analyzerAction.setLanguage(langDef);
-        actions.addMapping(analyzerAction);
+        EditorActions.i().addMapping(analyzerAction);
         // Need to explicitly bind renderable element with its renderer.
         // This kind of decoupling allows to complete divide logic from rendering.
         RenderersRegistry.i().register(Cursor.class,new CursorRenderer(),2);

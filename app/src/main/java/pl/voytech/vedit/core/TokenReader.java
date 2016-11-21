@@ -15,15 +15,13 @@ public class TokenReader extends AbstractGenericReader<KeyEvent,Token> implement
     private char terminator;
     private final EditorState state;
     private final EditorBuffer buffer;
-    private final EditorActions actions;
     private final List<TokenReaderFilter> filters = new ArrayList<TokenReaderFilter>();
     private final List<KeyEventActions> keyEventActions = new ArrayList<>();
 
-    public TokenReader(EditorBuffer buffer,EditorActions actions, EditorState state,KeyEventActions... keyEventActions){
+    public TokenReader(EditorBuffer buffer,EditorState state,KeyEventActions... keyEventActions){
         this.state = state;
         this.buffer = buffer;
         this.buffer.setTokenListener(this);
-        this.actions = actions;
         for (KeyEventActions kea : keyEventActions) {
             this.keyEventActions.add(kea);
         }
@@ -33,7 +31,7 @@ public class TokenReader extends AbstractGenericReader<KeyEvent,Token> implement
     private boolean after(KeyEvent character, Cursor cursor, Token token){
         boolean applied = false;
         for (TokenReaderFilter tokenReaderFilter : filters){
-            tokenReaderFilter.afterCharacterApply(character,cursor,token,actions,buffer);
+            tokenReaderFilter.afterCharacterApply(character,cursor,token,buffer);
             applied = true;
         }
         return applied;
@@ -43,12 +41,12 @@ public class TokenReader extends AbstractGenericReader<KeyEvent,Token> implement
     private void tokenReady(Cursor cursor, Token token){
         outputReady(token);
         for (TokenReaderFilter tokenReaderFilter : filters){
-            tokenReaderFilter.tokenReady(cursor,token,actions,buffer);
+            tokenReaderFilter.tokenReady(cursor,token,buffer);
         }
     }
-    private void keyActions(KeyEvent event,EditorBuffer buffer,Cursor cursor,EditorActions actions){
+    private void keyActions(KeyEvent event,EditorBuffer buffer,Cursor cursor){
         for (KeyEventActions kea : keyEventActions){
-            kea.onKeyEvent(event,buffer,cursor,actions);
+            kea.onKeyEvent(event,buffer,cursor);
             if (kea instanceof AbstractKeyEventActions){
                 if (((AbstractKeyEventActions) kea).isConsumed())
                     break;
@@ -58,7 +56,7 @@ public class TokenReader extends AbstractGenericReader<KeyEvent,Token> implement
 
     public void read(KeyEvent character){
         Cursor cursor = this.state.getCursor();
-        keyActions(character,buffer,cursor,actions);
+        keyActions(character,buffer,cursor);
         after(character,cursor,current);
     }
 

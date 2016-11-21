@@ -17,32 +17,32 @@ import pl.voytech.vedit.core.actions.SpaceAction;
 
 public class SpecialKeyEventActions extends AbstractKeyEventActions{
     @Override
-    public void onNotConsumedKeyEvent(KeyEvent k,EditorBuffer buffer,Cursor cursor,EditorActions actions) {
+    public void onNotConsumedKeyEvent(KeyEvent k,EditorBuffer buffer,Cursor cursor) {
         char ch = (char)k.getUnicodeChar();
         System.out.println(k.getKeyCode());
         switch (k.getKeyCode()){
             case KeyEvent.KEYCODE_ENTER:
-                actions.execute(EnterAction.class,buffer);
+                EditorActions.i().execute(EnterAction.class,buffer);
                 setConsumed();
                 break;
             case KeyEvent.KEYCODE_DEL:
-                actions.execute(BackspaceAction.class,buffer);
+                EditorActions.i().execute(BackspaceAction.class,buffer);
                 setConsumed();
                 break;
             case KeyEvent.KEYCODE_DPAD_DOWN:
-                actions.execute(CursorMoveAction.class,buffer, Cursor.Movements.NEXT_ROW);
+                EditorActions.i().execute(CursorMoveAction.class,buffer, Cursor.Movements.NEXT_ROW);
                 setConsumed();
                 break;
             case KeyEvent.KEYCODE_DPAD_UP:
-                actions.execute(CursorMoveAction.class,buffer,Cursor.Movements.PREV_ROW);
+                EditorActions.i().execute(CursorMoveAction.class,buffer,Cursor.Movements.PREV_ROW);
                 setConsumed();
                 break;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                actions.execute(CursorMoveAction.class,buffer,Cursor.Movements.NEXT_COLUMN);
+                EditorActions.i().execute(CursorMoveAction.class,buffer,Cursor.Movements.NEXT_COLUMN);
                 setConsumed();
                 break;
             case KeyEvent.KEYCODE_DPAD_LEFT:
-                actions.execute(CursorMoveAction.class,buffer,Cursor.Movements.PREV_COLUMN);
+                EditorActions.i().execute(CursorMoveAction.class,buffer,Cursor.Movements.PREV_COLUMN);
                 setConsumed();
                 break;
             case KeyEvent.KEYCODE_SHIFT_LEFT:
@@ -52,7 +52,7 @@ public class SpecialKeyEventActions extends AbstractKeyEventActions{
                 setConsumed();
                 break;
             case KeyEvent.KEYCODE_SPACE:
-                actions.execute(SpaceAction.class,buffer);
+                EditorActions.i().execute(SpaceAction.class,buffer);
                 setConsumed();
                 break;
         }

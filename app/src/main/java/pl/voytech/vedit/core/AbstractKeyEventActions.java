@@ -16,9 +16,9 @@ public abstract class AbstractKeyEventActions implements KeyEventActions{
     }
 
     @Override
-    public void onKeyEvent(KeyEvent k, EditorBuffer buffer, Cursor cursor, EditorActions actions) {
+    public void onKeyEvent(KeyEvent k, EditorBuffer buffer, Cursor cursor) {
         this.consumed = false;
-        onNotConsumedKeyEvent(k,buffer,cursor,actions);
+        onNotConsumedKeyEvent(k,buffer,cursor);
     }
-    public abstract void onNotConsumedKeyEvent(KeyEvent k, EditorBuffer buffer, Cursor cursor, EditorActions actions);
+    public abstract void onNotConsumedKeyEvent(KeyEvent k, EditorBuffer buffer, Cursor cursor);
 }

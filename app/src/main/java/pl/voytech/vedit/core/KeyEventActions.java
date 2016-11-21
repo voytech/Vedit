@@ -7,5 +7,5 @@ import android.view.KeyEvent;
  */
 
 public interface KeyEventActions {
-    void onKeyEvent(KeyEvent event, EditorBuffer buffer, Cursor cursor, EditorActions actions);
+    void onKeyEvent(KeyEvent event, EditorBuffer buffer, Cursor cursor);
 }

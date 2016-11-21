@@ -8,7 +8,7 @@ import android.view.KeyEvent;
 
 public interface TokenReaderFilter {
     //boolean shouldTerminate(KeyEvent ch, Cursor cursor, Token token);
-    void afterCharacterApply(KeyEvent ch, Cursor cursor, Token token, EditorActions actions, EditorBuffer buffer);
-    void tokenReady(Cursor c, Token t, EditorActions actions, EditorBuffer buffer);
+    void afterCharacterApply(KeyEvent ch, Cursor cursor, Token token,  EditorBuffer buffer);
+    void tokenReady(Cursor c, Token t, EditorBuffer buffer);
    // boolean preventNewToken(KeyEvent key);
 }

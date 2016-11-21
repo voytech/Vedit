@@ -14,9 +14,9 @@ import pl.voytech.vedit.core.actions.BuildTokenAction;
 
 public class DefaultKeyEventActions extends AbstractKeyEventActions{
     @Override
-    public void onNotConsumedKeyEvent(KeyEvent k, EditorBuffer buffer, Cursor cursor, EditorActions actions) {
+    public void onNotConsumedKeyEvent(KeyEvent k, EditorBuffer buffer, Cursor cursor) {
         char ch = (char)k.getUnicodeChar();
-        actions.execute(BuildTokenAction.class,buffer,new Object[]{ch});
+        EditorActions.i().execute(BuildTokenAction.class,buffer,new Object[]{ch});
         setConsumed();
     }
 }
