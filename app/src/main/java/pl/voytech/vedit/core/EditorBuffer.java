@@ -126,6 +126,7 @@ public class EditorBuffer implements Renderable,EditorApi {
     public Token newToken(String s) {
         Token token = newToken();
         token.update(s);
+        state.getCursor().nextPos(Cursor.Movements.NEXT_COLUMN,this);
         return token;
     }
 

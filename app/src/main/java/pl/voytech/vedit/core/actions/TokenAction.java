@@ -13,6 +13,7 @@ public class TokenAction implements EditorAction{
         if (args.length > 0) {
             if (args[0] instanceof String) {
                 buffer.newToken((String)args[0]);
+                buffer.end();
             }
         }
     }
