@@ -11,6 +11,9 @@ import java.util.concurrent.Callable;
  */
 
 public class ObjectCache {
+    public interface CacheIterator<T> {
+        void iterate(T obj);
+    }
     private final HashMap<Class<?>,List<WeakReference<?>>> cache = new HashMap<>();
     private static ObjectCache instance;
     private ObjectCache(){
@@ -26,10 +29,11 @@ public class ObjectCache {
         List list =  cache.get(object.getClass());
         if (list == null){
             list = new ArrayList<WeakReference<T>>();
+            cache.put(object.getClass(),list);
         }
-        list.add(new WeakReference<T>(object));
+        cache.get(object.getClass()).add(new WeakReference<T>(object));
     }
-    public <T> List<T> all(Class<T> clazz, Callable<T>... callables) throws Exception {
+    public <T> List<T> all(Class<T> clazz, CacheIterator<T>... iterables)  {
         List<WeakReference<?>> list =  cache.get(clazz);
         List<T> allByClass = new ArrayList<T>();
         if (list != null){
@@ -37,8 +41,8 @@ public class ObjectCache {
                 T deref = (T) element.get();
                 if (deref != null){
                     allByClass.add(deref);
-                    for (Callable<T> callable : callables ){
-                        callable.call();
+                    for (CacheIterator iterable : iterables ){
+                        iterable.iterate(deref);
                     }
                 }
             }

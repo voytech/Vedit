@@ -58,7 +58,7 @@ public class CodeEditor extends View {
 
     public void readKey(KeyEvent event){
         tokenBuilder.read(event);
-        System.out.println(buffer);
+        //System.out.println(buffer);
         this.invalidate();
     }
 
@@ -92,9 +92,9 @@ public class CodeEditor extends View {
         actions.addMapping(analyzerAction);
         // Need to explicitly bind renderable element with its renderer.
         // This kind of decoupling allows to complete divide logic from rendering.
-        RenderersRegistry.i().register(Cursor.class,new CursorRenderer());
-        RenderersRegistry.i().register(Token.class,new TokenRenderer());
-        RenderersRegistry.i().register(EditorBuffer.class,new EditorBufferRenderer());
+        RenderersRegistry.i().register(Cursor.class,new CursorRenderer(),2);
+        RenderersRegistry.i().register(Token.class,new TokenRenderer(),1);
+        RenderersRegistry.i().register(EditorBuffer.class,new EditorBufferRenderer(),3);
         RenderersRegistry.i().register(SyntaxHighlightFeature.class,new SyntaxHighlightFeatureRenderer());
 
         toggleKeyboard(true);
@@ -104,25 +104,18 @@ public class CodeEditor extends View {
                 return false;
             }
         });
-        this.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                System.out.println("View has been clicked");
-            }
-        });
+
         this.requestFocus();
 
-        //final TypedArray a = getContext().obtainStyledAttributes(
-        //        attrs, R.styleable.CodeEditor, defStyle, 0);
-       //a.recycle();
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        RenderersRegistry.i().render(buffer,canvas,config);
-        RenderersRegistry.i().render(state.getCursor(),canvas,config);
+        RenderersRegistry.i().renderAll(canvas,config);
+        // RenderersRegistry.i().render(buffer,canvas,config);
+       // RenderersRegistry.i().render(state.getCursor(),canvas,config);
 
     }
 }
