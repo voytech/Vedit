@@ -5,4 +5,5 @@ package pl.voytech.vedit.core.languages.definition.features;
  */
 
 public class MacroFeature {
+
 }

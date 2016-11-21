@@ -10,7 +10,8 @@ public class EditorState {
     private float textHeight = 40;
     private int baseColor = Color.WHITE;
     private final Cursor cursor;
-    
+    private int indentLevel;
+
     public EditorState(EditorConfig config){
         this.cursor = new Cursor(config);
     }
@@ -32,5 +33,13 @@ public class EditorState {
 
     public Cursor getCursor(){
         return cursor;
+    }
+
+    public int getIndentLevel() {
+        return indentLevel;
+    }
+
+    public void setIndentLevel(int indentLevel) {
+        this.indentLevel = indentLevel;
     }
 }

@@ -34,6 +34,7 @@ public class EditorBuffer implements Renderable,EditorApi {
     };
     public EditorBuffer(EditorState state) {
         this.state = state;
+        ObjectCache.i().add(this);
     }
 
     public EditorState getState(){
@@ -42,6 +43,10 @@ public class EditorBuffer implements Renderable,EditorApi {
 
     public void setTokenListener(TokenListener listener){
         this.listener = listener;
+    }
+
+    public int getIndentLevel(){
+        return this.state.getIndentLevel();
     }
 
     private List<Token> assertRow(int row) {
@@ -60,6 +65,7 @@ public class EditorBuffer implements Renderable,EditorApi {
             assertRow(e).add(token);
             Collections.sort(tokens.get(e),COLUMN_COMPARATOR);
         }
+        ObjectCache.i().add(token);
         tokensById.put(token.getId(),token);
     }
     public Token newToken(){
@@ -88,6 +94,7 @@ public class EditorBuffer implements Renderable,EditorApi {
             current = newToken();
         }
         current.insert(character,state.getCursor());
+        state.getCursor().nextPos(Cursor.Movements.NEXT_COLUMN,this);
     }
 
     @Override
@@ -97,6 +104,7 @@ public class EditorBuffer implements Renderable,EditorApi {
             if (!current.removeLeft(state.getCursor())){
                 this.delete(current);
             }
+            state.getCursor().nextPos(Cursor.Movements.PREV_COLUMN,this);
             return true;
         }
         return false;
@@ -138,12 +146,14 @@ public class EditorBuffer implements Renderable,EditorApi {
         Token token = this.pointedBy(c);
         if (token!=null) {
             Token newToken = token.split(c);
-            add(newToken);
-            if (this.listener!=null){
-                this.listener.ready(token);
-                this.listener.ready(newToken);
+            if (newToken!=null) {
+                add(newToken);
+                if (this.listener != null) {
+                    this.listener.ready(token);
+                    this.listener.ready(newToken);
+                }
+                return true;
             }
-            return true;
         }
         return false;
     }

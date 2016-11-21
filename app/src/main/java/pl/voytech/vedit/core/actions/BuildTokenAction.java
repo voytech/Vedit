@@ -35,11 +35,11 @@ public class BuildTokenAction extends CursorFirstArgAction {
      */
 
     private void tryMerge(EditorBuffer buffer,Cursor cursor){
-        cursor.nextPos(Cursor.Movements.PREV_COLUMN);
+        cursor.nextPos(Cursor.Movements.PREV_COLUMN,buffer);
         if (!isSeparator(buffer,cursor)) {
             buffer.merge();
         }
-        cursor.nextPos(Cursor.Movements.NEXT_COLUMN);
+        cursor.nextPos(Cursor.Movements.NEXT_COLUMN,buffer);
     }
 
     private boolean isSeparator(EditorBuffer buffer,Cursor cursor){
@@ -60,7 +60,7 @@ public class BuildTokenAction extends CursorFirstArgAction {
             buffer.insert(ch);
             tryMerge(buffer,cursor);
         } else {
-            cursor.nextPos(Cursor.Movements.NEXT_COLUMN);
+            cursor.nextPos(Cursor.Movements.NEXT_COLUMN,buffer);
         }
         buffer.allTokensInRowAfter(cursor, new EditorBuffer.TokenVisitor() {
             @Override

@@ -26,7 +26,7 @@ public class EnterAction extends CursorFirstArgAction {
                 buffer.move(token,0,1);
             }
        });
-       cursor.nextPos(Cursor.Movements.NEXT_ROW_START);
+       cursor.nextPos(Cursor.Movements.NEXT_ROW_START,buffer);
        buffer.allTokensInRow(new EditorBuffer.TokenVisitor(){
            int offset = 0;
            @Override

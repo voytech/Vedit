@@ -34,6 +34,7 @@ public class RenderersRegistry {
     public Renderer<? extends Renderable> get(Renderable renderable){
         return registry.get(renderable.getClass());
     }
+    
     public <T extends Renderable> void render(T renderable, Canvas canvas, EditorConfig config){
         Renderer<T> renderer = registry.get(renderable.getClass());
         if (renderer!=null){

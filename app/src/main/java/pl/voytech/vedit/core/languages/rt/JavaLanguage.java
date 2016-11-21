@@ -7,6 +7,7 @@ import pl.voytech.vedit.core.languages.definition.LangDef;
 import pl.voytech.vedit.core.languages.definition.LangTokenDef;
 import pl.voytech.vedit.core.languages.definition.LanguageFeatures;
 import pl.voytech.vedit.core.languages.definition.LanguageFeaturesProvider;
+import pl.voytech.vedit.core.languages.definition.features.MacroFeature;
 import pl.voytech.vedit.core.languages.definition.features.SyntaxHighlightFeature;
 
 /**
@@ -18,6 +19,7 @@ public class JavaLanguage {
     private void defineFeatures(){
         FeatureFactory.i().define("keyword-highlight",SyntaxHighlightFeature.class,Color.BLUE);
         FeatureFactory.i().define("separator-highlight",SyntaxHighlightFeature.class,Color.RED);
+        //FeatureFactory.i().define("braces-macro",MacroFeature.class,);
     }
 
     public LangDef definition(){
@@ -108,4 +110,5 @@ public class JavaLanguage {
         javaLangFeatures.add(separatorToken,"separator-highlight");
         return separatorToken;
     }
+
 }

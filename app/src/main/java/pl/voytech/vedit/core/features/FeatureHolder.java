@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import pl.voytech.vedit.core.EditorBuffer;
+import pl.voytech.vedit.core.ObjectCache;
 
 /**
  * Created by USER on 2016-11-08.
@@ -15,6 +16,7 @@ public abstract class FeatureHolder implements FeatureAware{
     @Override
     public void attachFeature(Feature feature, EditorBuffer buffer) {
         this.features.add(feature);
+        ObjectCache.i().add(feature);
         feature.setHolder(this);
         feature.onFeatureAttach(this,buffer);
     }

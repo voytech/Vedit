@@ -25,6 +25,6 @@ public class SpaceAction extends CursorFirstArgAction{
                 buffer.move(token,1,0);
             }
         },cursor.getRow(),true);
-        cursor.nextPos(Cursor.Movements.NEXT_COLUMN);
+        cursor.nextPos(Cursor.Movements.NEXT_COLUMN,buffer);
     }
 }

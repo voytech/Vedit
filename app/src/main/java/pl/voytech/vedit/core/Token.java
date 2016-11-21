@@ -53,7 +53,6 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
         }
         state = State.EDITING;
         endColumn = startColumn + value.length()-1;
-        c.nextPos(Cursor.Movements.NEXT_COLUMN);
     }
 
     @Override
@@ -71,7 +70,6 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
             state = State.EDITING;
             endColumn = startColumn + value.length() - 1;
         }
-        c.nextPos(Cursor.Movements.PREV_COLUMN);
         return result;
     }
 
@@ -90,6 +88,9 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
     @Override
     public Token split(Cursor c){
         int offset = c.getColumn() - startColumn;
+        if (offset == 0){
+            return null;
+        }
         String leftSideVal = value.substring(0,offset);
         String rightSideVal = value.substring(offset);
         state = State.FINISHED;

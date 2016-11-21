@@ -13,7 +13,7 @@ public class BackspaceAction extends CursorFirstArgAction {
     @Override
     public void executeWithCursor(final EditorBuffer buffer, Cursor cursor, Token currentToken, Object... obj) {
         if (currentToken==null){
-            cursor.nextPos(Cursor.Movements.PREV_COLUMN);
+            cursor.nextPos(Cursor.Movements.PREV_COLUMN,buffer);
         } else {
             buffer.removeLeft();
         }

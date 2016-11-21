@@ -17,6 +17,7 @@ public class EditorConfig {
     private String font = "aA";
     private int rowLength = 300;
     private int rowCount = 1000;
+    private int indentLength = 2;
     private int baseColor = Color.WHITE;
     private int backgroundColor = Color.WHITE;
     private int topMargin = 0;
@@ -95,5 +96,13 @@ public class EditorConfig {
 
     public void setTopMargin(int topMargin) {
         this.topMargin = topMargin;
+    }
+
+    public int getIndentLength() {
+        return indentLength;
+    }
+
+    public void setIndentLength(int indentLength) {
+        this.indentLength = indentLength;
     }
 }

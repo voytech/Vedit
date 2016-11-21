@@ -30,11 +30,13 @@ public class Cursor implements Renderable {
         this.row = 1;
         this.column = 1;
         this.config = config;
+        ObjectCache.i().add(this);
     }
     public Cursor(int row, int column,EditorConfig config){
         this.row = row;
         this.column = column;
         this.config = config;
+        ObjectCache.i().add(this);
     }
 
     public int getRow() {
@@ -53,7 +55,15 @@ public class Cursor implements Renderable {
         this.column = column;
     }
 
-    public void nextPos(Movements direction){
+    private int applyIndent(EditorBuffer buffer){
+        Integer indent = buffer.getIndentLevel();
+        if (indent != null){
+            return config.getIndentLength()*indent.intValue();
+        }
+        return 1;
+    }
+
+    public void nextPos(Movements direction,EditorBuffer buffer){
         switch(direction){
             case PREV_ROW:    row--;
                               break;
@@ -74,11 +84,13 @@ public class Cursor implements Renderable {
                                 column++;
                               }
                               break;
-            case NEXT_ROW_START: column = 1;
+            case NEXT_ROW_START:
                                  row++;
+                                 column = applyIndent(buffer);
                                  break;
-            case PREV_ROW_START: column = 1;
+            case PREV_ROW_START:
                                  row--;
+                                 column = applyIndent(buffer);
                                  break;
         }
     }

@@ -12,6 +12,6 @@ public class CursorMoveAction extends CursorFirstArgAction{
     @Override
     public void executeWithCursor(EditorBuffer buffer, Cursor cursor, Token currentToken, Object... rest) {
         Cursor.Movements direction = (Cursor.Movements) rest[0];
-        cursor.nextPos(direction);
+        cursor.nextPos(direction,buffer);
     }
 }
