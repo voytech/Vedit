@@ -11,6 +11,7 @@ import pl.voytech.vedit.core.features.AbstractFeature;
 public class DefinitionTrackFeature extends AbstractFeature<Token>{
     private final String defId;
     public DefinitionTrackFeature(String defId){
+        super();
         this.defId = defId;
     }
     @Override

@@ -108,6 +108,7 @@ public class CodeEditor extends View {
 
         this.requestFocus();
 
+
     }
 
 

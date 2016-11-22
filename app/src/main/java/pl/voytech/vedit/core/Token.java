@@ -27,6 +27,7 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
         id = UUID.randomUUID();
     }
     public Token(Cursor c){
+        super();
         id = UUID.randomUUID();
         assertStart(c);
     }

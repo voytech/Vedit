@@ -15,6 +15,7 @@ import pl.voytech.vedit.core.features.AbstractFeature;
 public class MacroFeature  extends AbstractFeature<Token> {
     private final List<ActionInvokation> invokations;
     public MacroFeature(ActionInvokations invocations){
+        super();
         this.invokations = invocations.get();
     }
     @Override

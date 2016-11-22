@@ -6,7 +6,7 @@ import pl.voytech.vedit.core.renderers.core.Renderable;
  * Created by USER on 2016-10-26.
  */
 
-public class Cursor implements Renderable {
+public class Cursor extends CachedObject implements Renderable {
 
     public enum Movements{
         NEXT_COLUMN,
@@ -27,16 +27,16 @@ public class Cursor implements Renderable {
     private final EditorConfig config;
 
     public Cursor(EditorConfig config){
+        super();
         this.row = 1;
         this.column = 1;
         this.config = config;
-        ObjectCache.i().add(this);
     }
     public Cursor(int row, int column,EditorConfig config){
+        super();
         this.row = row;
         this.column = column;
         this.config = config;
-        ObjectCache.i().add(this);
     }
 
     public int getRow() {

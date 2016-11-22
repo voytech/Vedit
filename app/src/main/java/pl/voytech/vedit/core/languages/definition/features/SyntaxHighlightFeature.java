@@ -12,6 +12,7 @@ public class SyntaxHighlightFeature extends AbstractFeature<Token>  {
     private int color;
 
     public SyntaxHighlightFeature(Integer color){
+        super();
         this.color = color;
         this.setOverrideDefaultTokenRenderer(true);
     }

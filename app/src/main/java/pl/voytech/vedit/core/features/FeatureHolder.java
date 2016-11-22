@@ -13,6 +13,11 @@ import pl.voytech.vedit.core.ObjectCache;
 
 public abstract class FeatureHolder implements FeatureAware{
     private final List<Feature> features = new ArrayList<>();
+
+    public FeatureHolder(){
+        ObjectCache.i().add(this);
+    }
+
     @Override
     public void attachFeature(Feature feature, EditorBuffer buffer) {
         this.features.add(feature);

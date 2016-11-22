@@ -9,5 +9,8 @@ import pl.voytech.vedit.core.Token;
 public abstract class SpanningFeature<T extends FeatureAware> extends AbstractFeature<T>{
     private Token start;
     private Token end;
+    public SpanningFeature(){
+        super();
+    }
 
 }

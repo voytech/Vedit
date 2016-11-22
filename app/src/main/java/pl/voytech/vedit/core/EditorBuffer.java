@@ -16,7 +16,7 @@ import pl.voytech.vedit.core.renderers.core.Renderable;
  * Created by USER on 2016-10-26.
  */
 
-public class EditorBuffer implements Renderable,EditorApi {
+public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
     public class Span{
         private final Token start;
         private final Token end;
@@ -65,8 +65,8 @@ public class EditorBuffer implements Renderable,EditorApi {
     };
 
     public EditorBuffer(EditorState state) {
+        super();
         this.state = state;
-        ObjectCache.i().add(this);
     }
 
     public void spanFeature(Span span,SpanningFeature feature){
@@ -113,7 +113,6 @@ public class EditorBuffer implements Renderable,EditorApi {
             assertRow(e).add(token);
             Collections.sort(tokens.get(e),COLUMN_COMPARATOR);
         }
-        ObjectCache.i().add(token);
         tokensById.put(token.getId(),token);
     }
 
