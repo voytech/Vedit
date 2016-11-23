@@ -49,7 +49,7 @@ public class LangAnalyzer {
             for (String key : featureKeys) {
                 FeatureFactory.i().bind(key,token,buffer);
             }
-            analyzed.put(token.getId(),token.getValue());
+            //analyzed.put(token.getId(),token.getValue());
         }else{
             token.detachFeatures(buffer);
         }

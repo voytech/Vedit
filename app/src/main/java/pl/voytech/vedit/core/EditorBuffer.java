@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import com.android.internal.util.Predicate;
 
 import pl.voytech.vedit.core.features.SpanningFeature;
 import pl.voytech.vedit.core.renderers.core.Renderable;
@@ -222,7 +223,10 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
 
     @Override
     public void move(Token token, int colOffs, int rowOffs){
-        delete(token);
+        //delete(token);
+        if (tokens.containsKey(token.getStartRow())){
+            tokens.get(token.getStartRow()).remove(token);
+        }
         token.move(colOffs,rowOffs);
         add(token);
     }
@@ -308,13 +312,18 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
         return current;
     }
 
-    public void allTokens(TokenVisitor visitor){
-        for (List<Token> row : tokens.values()){
-            for (int i=0;i<=row.size()-1;i++){
-                visitor.visit(row.get(i),i);
+    public void allTokensByPredicate(Predicate<Token> predicate, TokenVisitor visitor){
+        for (int j=1;j<=tokens.size();j++){
+            List<Token> row = tokens.get(j);
+            for (int i=0;i<row.size();i++){
+                Token token = row.get(i);
+                if (predicate.apply(token)) {
+                    visitor.visit(token, i);
+                }
             }
         }
     }
+
     public void allTokensInRow(TokenVisitor visitor,int row){
         if (tokens.containsKey(row)) {
             for (int i = 0; i <= tokens.get(row).size() - 1; i++) {
@@ -352,6 +361,28 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
         }
     }
 
+    public Token[] getRow(int row){
+        return tokens.containsKey(row) ? tokens.get(row).toArray(new Token[]{}) : null;
+    }
+
+    public Token[][] getRows(int startRow,int endRow){
+        List<Token[]> rows = new ArrayList<>();
+        for (int i=startRow;i<=endRow;i++){
+            Token[] row;
+            if (tokens.containsKey(i)){
+                rows.add(getRow(i));
+            }
+        }
+        return rows.toArray(new Token[][]{});
+    }
+
+    public void deleteRow(int row){
+        if (tokens.containsKey(row)){
+            for (Token token : tokens.get(row)){
+                delete(token);
+            }
+        }
+    }
 
     @Override
     public String toString(){

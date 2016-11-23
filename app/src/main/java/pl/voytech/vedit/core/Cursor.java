@@ -55,42 +55,48 @@ public class Cursor extends CachedObject implements Renderable {
         this.column = column;
     }
 
-    private int applyIndent(EditorBuffer buffer){
+    private int applyIndent(EditorBuffer buffer,boolean lineStart){
         Integer indent = buffer.getIndentLevel();
+        int resCol = lineStart ? 1 : column;
         if (indent != null){
-            return config.getIndentLength()*indent.intValue();
+            int cols = config.getIndentLength()*indent.intValue();
+            resCol = cols > resCol ? cols : resCol;
         }
-        return 1;
+        return resCol;
     }
 
     public void nextPos(Movements direction,EditorBuffer buffer){
         switch(direction){
-            case PREV_ROW:    row--;
-                              break;
-            case NEXT_ROW:
-                              row++;
-                              break;
-            case PREV_COLUMN: if (column == 1){
-                                column = config.getRowLength();
-                                row --;
-                              } else {
-                                column--;
-                              }
-                              break;
-            case NEXT_COLUMN: if (column == config.getRowLength()){
-                                column = 1;
-                                row++;
-                              } else {
-                                column++;
-                              }
-                              break;
-            case NEXT_ROW_START:
-                                 row++;
-                                 column = applyIndent(buffer);
+            case PREV_ROW:       row--;
+                                 column = applyIndent(buffer,false);
                                  break;
-            case PREV_ROW_START:
-                                 row--;
-                                 column = applyIndent(buffer);
+
+            case NEXT_ROW:       row++;
+                                 column = applyIndent(buffer,false);
+                                 break;
+
+            case PREV_COLUMN:    if (column == 1){
+                                   column = config.getRowLength();
+                                   row --;
+                                 } else {
+                                   column--;
+                                 }
+                                 break;
+
+            case NEXT_COLUMN:    if (column == config.getRowLength()){
+                                    column = 1;
+                                    row++;
+                                 } else {
+                                    column++;
+                                 }
+                                 break;
+
+            case NEXT_ROW_START: row++;
+                                 column = applyIndent(buffer,true);
+                                 break;
+
+            case PREV_ROW_START: row--;
+                                 column = applyIndent(buffer,true);
                                  break;
         }
     }

@@ -12,7 +12,7 @@ import android.text.TextPaint;
 
 public class EditorConfig {
     private final TextPaint textPaint = new TextPaint();
-    private float glyphHeight = 45;
+    private float glyphHeight = 45; //20
     private float glyphWidth = -1; //needs to be measured on canvas.
     private String font = "aA";
     private int rowLength = 300;
