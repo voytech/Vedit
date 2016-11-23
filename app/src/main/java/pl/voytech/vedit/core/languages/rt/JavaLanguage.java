@@ -3,7 +3,9 @@ package pl.voytech.vedit.core.languages.rt;
 import android.app.Notification;
 import android.graphics.Color;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import pl.voytech.vedit.core.Cursor;
 import pl.voytech.vedit.core.actions.ActionInvokation;
@@ -45,14 +47,15 @@ public class JavaLanguage {
     public LangDef definition(){
         defineFeatures();
         LangDef def = new LangDef("java");
+
         LanguageFeaturesProvider.i().defineLangFeatures("java",javaLangFeatures);
+
         ////////////////////////////////////////////////////////////////////
         // Keywords
         ////////////////////////////////////////////////////////////////////
         def.addLangPart(createKeyword("abstract",new String[]{"abstract-class","abstract-method"}));
         def.addLangPart(createKeyword("assert",new String[]{""}));
-        def.addLangPart(createKeyword("boolean",new String[]{"boolean-arr","boolean-arr-init","boolean-var","boolean-var-init"}));
-       // createProduction(def,"boolean-arr","boolean","[","]");
+        def.addLangPart(createKeyword("boolean",new String[]{"primitive-array","primitive-array-init","primitive","primitive-init"}));
         def.addLangPart(createKeyword("break",new String[]{"",""}));
         def.addLangPart(createKeyword("byte",new String[]{"byte-arr","byte-arr-init","byte-var","byte-var-init"}));
         def.addLangPart(createKeyword("case",new String[]{"",""}));
@@ -114,6 +117,55 @@ public class JavaLanguage {
         def.addLangPart(createSeparator(",","\\,",new String[]{}));
         def.addLangPart(createSeparator(".","\\.",new String[]{}));
         def.addLangPart(createIdentifier());
+        ////////////////////////////////////////////////////////////////////
+        // Language Productions. Forms valid context-free grammar.
+        ////////////////////////////////////////////////////////////////////
+        List<String[]> prods = new ArrayList();
+        prods.add(new String[]{"boolean","[","]","identifier",";"});
+        prods.add(new String[]{"double","[","]","identifier",";"});
+        prods.add(new String[]{"float","[","]","identifier",";"});
+        prods.add(new String[]{"long","[","]","identifier",";"});
+        prods.add(new String[]{"int","[","]","identifier",";"});
+        prods.add(new String[]{"byte","[","]","identifier",";"});
+        prods.add(new String[]{"short","[","]","identifier",";"});
+        createProduction(def,"primitive-arr",prods);
+        List<String[]> prods2 = new ArrayList();
+        prods2.add(new String[]{"boolean","identifier",";"});
+        prods2.add(new String[]{"double","identifier",";"});
+        prods2.add(new String[]{"float","identifier",";"});
+        prods2.add(new String[]{"long","identifier",";"});
+        prods2.add(new String[]{"int","identifier",";"});
+        prods2.add(new String[]{"byte","identifier",";"});
+        prods2.add(new String[]{"short","identifier",";"});
+        createProduction(def,"primitive",prods2);
+        List<String[]> prods3 = new ArrayList();
+        prods3.add(new String[]{"private","primitive"});
+        prods3.add(new String[]{"public","primitive"});
+        prods3.add(new String[]{"protected","primitive"});
+        prods3.add(new String[]{"private","final","primitive"});
+        prods3.add(new String[]{"public","final","primitive"});
+        prods3.add(new String[]{"protected","final","primitive"});
+        prods3.add(new String[]{"final","primitive"});
+        prods3.add(new String[]{"private","static","final","primitive"});
+        prods3.add(new String[]{"public","static","final","primitive"});
+        prods3.add(new String[]{"protected","static","final","primitive"});
+        prods3.add(new String[]{"static","final","primitive"});
+        prods3.add(new String[]{"static","primitive"});
+        createProduction(def,"primitive-with-modifier",prods3);
+        List<String[]> prods4 = new ArrayList();
+        prods4.add(new String[]{"private","primitive-arr"});
+        prods4.add(new String[]{"public","primitive-arr"});
+        prods4.add(new String[]{"protected","primitive-arr"});
+        prods4.add(new String[]{"private","final","primitive-arr"});
+        prods4.add(new String[]{"public","final","primitive-arr"});
+        prods4.add(new String[]{"protected","final","primitive-arr"});
+        prods4.add(new String[]{"final","primitive-arr"});
+        prods4.add(new String[]{"private","static","final","primitive-arr"});
+        prods4.add(new String[]{"public","static","final","primitive-arr"});
+        prods4.add(new String[]{"protected","static","final","primitive-arr"});
+        prods4.add(new String[]{"static","final","primitive-arr"});
+        prods4.add(new String[]{"static","primitive-arr"});
+        createProduction(def,"primitive-arr-with-modifier",prods4);
         return def;
     }
     private LangTokenDef createKeyword(String keyword,String[] startsProductions){
@@ -140,11 +192,15 @@ public class JavaLanguage {
         javaLangFeatures.add(ident,"identifier-highlight");
         return ident;
     }
-    private LangPartDef createProduction(LangDef lang,String name,String... tokens){
+    private LangPartDef createProduction(LangDef lang,String name,List<String[]> productions){
         LangProductionDef productionDef = new LangProductionDef();
         productionDef.setId(name);
-        for (String token : tokens){
-            productionDef.add(lang.getById(token));
+        for (String[] production : productions){
+            List<LangPartDef> defs = new ArrayList<>();
+            for (String kw : production){
+                defs.add(lang.getById(kw));
+            }
+            productionDef.add(defs.toArray(new LangPartDef[]{}));
         }
         lang.addLangPart(productionDef);
         return productionDef;

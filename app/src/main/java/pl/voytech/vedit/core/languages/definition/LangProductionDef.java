@@ -14,7 +14,7 @@ import pl.voytech.vedit.core.TokenProduction;
 
 public class LangProductionDef extends LangPartDef<TokenProduction,TokenProduction>{
     private final Map<String,LangPartDef> partsMap = new HashMap<>();
-    private final List<LangPartDef> parts = new ArrayList<>();
+    private final List<LangPartDef[]> parts = new ArrayList<>();
     public Map<String, LangPartDef> getPartsMap() {
         return partsMap;
     }
@@ -23,9 +23,11 @@ public class LangProductionDef extends LangPartDef<TokenProduction,TokenProducti
         return this.parts.toArray(new LangPartDef[]{});
     }
 
-    public LangProductionDef add(LangPartDef def){
-        this.getPartsMap().put(def.getId(),def);
-        this.parts.add(def);
+    public LangProductionDef add(LangPartDef[] prod){
+        for (LangPartDef def : prod) {
+            this.getPartsMap().put(def.getId(), def);
+        }
+        this.parts.add(prod);
         return this;
     }
 
