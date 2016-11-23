@@ -57,6 +57,9 @@ public class BuildTokenAction extends CursorFirstArgAction {
     public void executeWithCursor(final EditorBuffer buffer, Cursor cursor, Token currentToken, Object... args) {
         char ch = (char)args[0];
         if (!(ch == ' ' && currentToken.getStartColumn() <= cursor.getColumn() && currentToken.getEndColumn() > cursor.getColumn())) {
+            if (isSeparator(buffer,cursor)){
+                buffer.newToken();
+            }
             buffer.insert(ch);
             tryMerge(buffer,cursor);
         } else {

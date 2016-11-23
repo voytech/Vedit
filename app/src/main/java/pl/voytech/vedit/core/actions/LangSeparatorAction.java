@@ -23,18 +23,31 @@ public class LangSeparatorAction extends CursorFirstArgAction{
             }
         }
     }
+
     @Override
     public void executeWithCursor(final EditorBuffer buffer, Cursor cursor, Token currentToken, Object... args) {
         char ch = (char)args[0];
-        tryEnd(cursor,buffer);
-        buffer.insert(ch);
-        tryEnd(cursor,buffer);
-        buffer.allTokensInRowAfter(cursor, new EditorBuffer.TokenVisitor() {
-            @Override
-            public void visit(Token token,int index) {
-                buffer.move(token,1,0);
-            }
-        },cursor.getRow(),true);
-        //cursor.nextPos(Cursor.Movements.NEXT_COLUMN);
+        if (buffer.split()) {
+            buffer.insert(ch);
+            buffer.split();
+            buffer.allTokensInRowAfter(cursor, new EditorBuffer.TokenVisitor() {
+                @Override
+                public void visit(Token token,int index) {
+                    buffer.move(token,1,0);
+                }
+            },cursor.getRow(),false);
+        }else {
+            tryEnd(cursor, buffer);
+            buffer.newToken();
+            buffer.insert(ch);
+            tryEnd(cursor, buffer);
+            buffer.allTokensInRowAfter(cursor, new EditorBuffer.TokenVisitor() {
+                @Override
+                public void visit(Token token,int index) {
+                    buffer.move(token,1,0);
+                }
+            },cursor.getRow(),true);
+        }
+
     }
 }

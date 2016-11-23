@@ -17,7 +17,8 @@ public class LangTokenDef extends LangPartDef<Token,Token>{
         KEYWORD,
         SEPARATOR,
         LITERAL,
-
+        IDENTIFIER,
+        OPERATOR
     };
     private String pattern;
     private Pattern patternc;

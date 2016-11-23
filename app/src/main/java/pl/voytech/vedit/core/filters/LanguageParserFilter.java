@@ -24,12 +24,12 @@ public class LanguageParserFilter implements TokenReaderFilter {
 
     @Override
     public void afterCharacterApply(KeyEvent ch, Cursor cursor, Token token, EditorBuffer buffer) {
-        EditorActions.i().execute(LangAnalyzerAction.class,buffer,cursor); //maybe expensive ?
+        //EditorActions.i().execute(LangAnalyzerAction.class,buffer,cursor); //maybe expensive ?
     }
 
     @Override
-    public void tokenReady(Cursor c, Token t,  EditorBuffer buffer) {
-        //actions.execute(LangAnalyzerAction.class,buffer,c);
+    public void tokenStateChanged(Cursor c, Token t,  EditorBuffer buffer) {
+        EditorActions.i().execute(LangAnalyzerAction.class,buffer,c);
     }
 
 

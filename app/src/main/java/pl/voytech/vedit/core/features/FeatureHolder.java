@@ -21,7 +21,7 @@ public abstract class FeatureHolder implements FeatureAware{
     @Override
     public void attachFeature(Feature feature, EditorBuffer buffer) {
         this.features.add(feature);
-        ObjectCache.i().add(feature);
+        //ObjectCache.i().add(feature);
         feature.setHolder(this);
         feature.onFeatureAttach(this,buffer);
     }
@@ -31,6 +31,7 @@ public abstract class FeatureHolder implements FeatureAware{
         this.features.remove(feature);
         feature.setHolder(null);
         feature.onFeatureDetach(this,buffer);
+        ObjectCache.i().remove(feature); //this should not be required. WeakReference.
     }
     @Override
     public void detachFeatures(EditorBuffer buffer){
@@ -40,6 +41,7 @@ public abstract class FeatureHolder implements FeatureAware{
            feature.onFeatureDetach(this,buffer);
            feature.setHolder(null);
            iter.remove();
+           ObjectCache.i().remove(feature); // this should not be required.
        }
     }
     public List<Feature> getFeatures(){

@@ -9,7 +9,7 @@ import java.util.List;
  * Created by USER on 2016-10-26.
  */
 
-public class TokenReader extends AbstractGenericReader<KeyEvent,Token> implements EditorBuffer.TokenListener {
+public class TokenReader extends AbstractGenericReader<KeyEvent,Token> implements Token.StateChangeListener {
     private Token current;
     private boolean terminating = false;
     private char terminator;
@@ -38,10 +38,10 @@ public class TokenReader extends AbstractGenericReader<KeyEvent,Token> implement
     }
 
 
-    private void tokenReady(Cursor cursor, Token token){
+    private void tokenStateChanged(Cursor cursor, Token token){
         outputReady(token);
         for (TokenReaderFilter tokenReaderFilter : filters){
-            tokenReaderFilter.tokenReady(cursor,token,buffer);
+            tokenReaderFilter.tokenStateChanged(cursor,token,buffer);
         }
     }
     private void keyActions(KeyEvent event,EditorBuffer buffer,Cursor cursor){
@@ -69,8 +69,9 @@ public class TokenReader extends AbstractGenericReader<KeyEvent,Token> implement
         this.keyEventActions.add(actions);
     }
 
+
     @Override
-    public void ready(Token token) {
-        tokenReady(this.state.getCursor(),token);
+    public void onStateChanged(Token t) {
+        tokenStateChanged(this.state.getCursor(),t);
     }
 }

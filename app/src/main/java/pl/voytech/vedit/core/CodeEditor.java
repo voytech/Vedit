@@ -58,7 +58,7 @@ public class CodeEditor extends View {
 
     public void readKey(KeyEvent event){
         tokenBuilder.read(event);
-        //System.out.println(buffer);
+        System.out.println(buffer);
         this.invalidate();
     }
 

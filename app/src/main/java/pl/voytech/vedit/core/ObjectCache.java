@@ -33,6 +33,13 @@ public class ObjectCache {
         }
         cache.get(object.getClass()).add(new WeakReference<T>(object));
     }
+    public <T> void remove(T object){
+        List<WeakReference<?>> list =  cache.get(object.getClass());
+        for (WeakReference element : list){
+            if (object.equals(element.get()))
+                element.clear();
+        }
+    }
     public <T> List<T> all(Class<T> clazz, CacheIterator<T>... iterables)  {
         List<WeakReference<?>> list =  cache.get(clazz);
         List<T> allByClass = new ArrayList<T>();

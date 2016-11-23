@@ -14,6 +14,8 @@ import pl.voytech.vedit.core.actions.SpaceAction;
 import pl.voytech.vedit.core.actions.TokenAction;
 import pl.voytech.vedit.core.features.FeatureFactory;
 import pl.voytech.vedit.core.languages.definition.LangDef;
+import pl.voytech.vedit.core.languages.definition.LangPartDef;
+import pl.voytech.vedit.core.languages.definition.LangProductionDef;
 import pl.voytech.vedit.core.languages.definition.LangTokenDef;
 import pl.voytech.vedit.core.languages.definition.LanguageFeatures;
 import pl.voytech.vedit.core.languages.definition.LanguageFeaturesProvider;
@@ -29,6 +31,7 @@ public class JavaLanguage {
     private void defineFeatures(){
         FeatureFactory.i().define("keyword-highlight",SyntaxHighlightFeature.class,Color.BLUE);
         FeatureFactory.i().define("separator-highlight",SyntaxHighlightFeature.class,Color.RED);
+        FeatureFactory.i().define("identifier-highlight",SyntaxHighlightFeature.class,Color.GRAY);
         FeatureFactory.i().define("curly-brace-macro",
                                   MacroFeature.class,
                                   new ActionInvokations().add(new ActionInvokation(EnterAction.class))
@@ -49,6 +52,7 @@ public class JavaLanguage {
         def.addLangPart(createKeyword("abstract",new String[]{"abstract-class","abstract-method"}));
         def.addLangPart(createKeyword("assert",new String[]{""}));
         def.addLangPart(createKeyword("boolean",new String[]{"boolean-arr","boolean-arr-init","boolean-var","boolean-var-init"}));
+       // createProduction(def,"boolean-arr","boolean","[","]");
         def.addLangPart(createKeyword("break",new String[]{"",""}));
         def.addLangPart(createKeyword("byte",new String[]{"byte-arr","byte-arr-init","byte-var","byte-var-init"}));
         def.addLangPart(createKeyword("case",new String[]{"",""}));
@@ -109,6 +113,7 @@ public class JavaLanguage {
         def.addLangPart(createSeparator(":","\\:",new String[]{}));
         def.addLangPart(createSeparator(",","\\,",new String[]{}));
         def.addLangPart(createSeparator(".","\\.",new String[]{}));
+        def.addLangPart(createIdentifier());
         return def;
     }
     private LangTokenDef createKeyword(String keyword,String[] startsProductions){
@@ -126,6 +131,23 @@ public class JavaLanguage {
         separatorToken.setGroup(LangTokenDef.TokenGroup.SEPARATOR);
         javaLangFeatures.add(separatorToken,"separator-highlight");
         return separatorToken;
+    }
+    private LangTokenDef createIdentifier(){
+        LangTokenDef ident = new LangTokenDef();
+        ident.setPattern("^([A-Za-z_]+[A-Za-z0-9_]*)$");
+        ident.setId("identifier");
+        ident.setGroup(LangTokenDef.TokenGroup.IDENTIFIER);
+        javaLangFeatures.add(ident,"identifier-highlight");
+        return ident;
+    }
+    private LangPartDef createProduction(LangDef lang,String name,String... tokens){
+        LangProductionDef productionDef = new LangProductionDef();
+        productionDef.setId(name);
+        for (String token : tokens){
+            productionDef.add(lang.getById(token));
+        }
+        lang.addLangPart(productionDef);
+        return productionDef;
     }
     private LangTokenDef withFeature(LangTokenDef langTokenDef,String feature){
         javaLangFeatures.add(langTokenDef,feature);

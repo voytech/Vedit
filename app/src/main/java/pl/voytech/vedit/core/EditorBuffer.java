@@ -17,6 +17,8 @@ import pl.voytech.vedit.core.renderers.core.Renderable;
  */
 
 public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
+
+
     public class Span{
         private final Token start;
         private final Token end;
@@ -47,7 +49,7 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
         }
     }
     interface TokenListener {
-        void ready(Token token);
+        void stateChanged(Token token);
     }
     public interface TokenVisitor{
         void visit(Token token, int index);
@@ -56,7 +58,7 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
     private final Map<UUID,Token> tokensById = new HashMap<>();
     private final Map<Span,List<SpanningFeature>> groupFeatures = new HashMap<>();
     private final EditorState state;
-    private TokenListener listener;
+    private Token.StateChangeListener listener;
     private final Comparator<Token> COLUMN_COMPARATOR = new Comparator<Token>() {
         @Override
         public int compare(Token token, Token t1) {
@@ -89,7 +91,7 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
         return state;
     }
 
-    public void setTokenListener(TokenListener listener){
+    public void setTokenListener(Token.StateChangeListener listener){
         this.listener = listener;
     }
 
@@ -117,7 +119,7 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
     }
 
     public Token newToken(){
-        Token token = new Token(state.getCursor());
+        Token token = new Token(state.getCursor(),listener);
         add(token);
         return token;
     }
@@ -139,7 +141,7 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
     @Override
     public void insert(char character) {
         Token current = this.currentToken();
-        if (current==null || (current!=null && current.getState() == Token.State.FINISHED && current.rightBefore(state.getCursor()))){
+        if (current==null){
             current = newToken();
         }
         current.insert(character,state.getCursor());
@@ -180,9 +182,6 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
             if (pointedToken.getStartColumn() == c.getColumn()) {
                 delete(pointedToken);
                 rightBeforeToken.update(rightBeforeToken.getValue() + pointedToken.getValue());
-                if (this.listener!=null){
-                    this.listener.ready(rightBeforeToken);
-                }
                 return true;
             }
         }
@@ -197,10 +196,6 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
             Token newToken = token.split(c);
             if (newToken!=null) {
                 add(newToken);
-                if (this.listener != null) {
-                    this.listener.ready(token);
-                    this.listener.ready(newToken);
-                }
                 return true;
             }
         }
@@ -212,9 +207,6 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
         Token current = tokenBefore(state.getCursor());
         if (current!=null){
             current.setState(Token.State.FINISHED);
-            if (this.listener!=null){
-                this.listener.ready(current);
-            }
         } else throw new RuntimeException("Can only end tokens right before cursor position!");
     }
 
@@ -222,9 +214,6 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
     public void end(Token token) {
         if (token.rightBefore(state.getCursor())) {
             token.setState(Token.State.FINISHED);
-            if (this.listener != null) {
-                this.listener.ready(token);
-            }
         } else throw new RuntimeException("Can only end tokens right before cursor position!");
     }
 
@@ -257,6 +246,8 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
     }
 
     public void delete(Token token){
+        token.detachFeatures(this);
+        ObjectCache.i().remove(token);
         int sR = token.getStartRow();
         int eR = token.getEndRow();
         Iterator<Token> tokenSIterator = tokens.get(sR).iterator();
@@ -360,6 +351,7 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
         }
     }
 
+
     @Override
     public String toString(){
         StringBuilder builder = new StringBuilder();
@@ -371,11 +363,13 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
                 builder.append("|");
                 builder.append(" [ ").append(token.getStartRow()).append(":").append(token.getStartColumn()).append(":").append(token.getEndColumn());
                 builder.append("] ").append(value.trim().isEmpty() ? "SPACE":value);
+                builder.append(token.getState()== Token.State.EDITING?" (E) ":" (F) ");
                 builder.append("|");
             }
             builder.append("\nEnd Line ( ").append(line).append(" )\n");
         }
         return builder.toString();
     }
+
 
 }

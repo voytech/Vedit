@@ -37,7 +37,11 @@ public class LangAnalyzer {
 
     public void analyze(Token token, EditorBuffer buffer){
         if (token==null) return;
-        if (alreadyAnalyzed(token)) return;
+        //if (alreadyAnalyzed(token)) return;
+        if (token.getState() != Token.State.FINISHED){
+            token.detachFeatures(buffer);
+            return;
+        }
         String val = token.getValue();
         LangPartDef tokenDef = language.find(val);
         if (tokenDef!=null){

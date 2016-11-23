@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 public class LangDef {
     private String languageName;
     private final Map<String,LangPartDef> grammar = new HashMap<>();
+    private final List<LangPartDef> sortedGrammar = new ArrayList<>();
     public LangDef(String languageName){
         this.languageName = languageName;
     }
@@ -28,8 +29,14 @@ public class LangDef {
     public Map<String, LangPartDef> getGrammar() {
         return grammar;
     }
+
     public void addLangPart(LangPartDef def){
         grammar.put(def.getId(),def);
+        sortedGrammar.add(def);
+    }
+
+    public LangPartDef getById(String id){
+        return getGrammar().get(id);
     }
 
     public List<LangTokenDef> byGroup(LangTokenDef.TokenGroup group){
@@ -46,7 +53,7 @@ public class LangDef {
     }
 
     public LangPartDef find(String token){
-        for (LangPartDef part : grammar.values()){
+        for (LangPartDef part : sortedGrammar){
             if (part instanceof LangTokenDef) {
                 LangTokenDef tpart = (LangTokenDef)part;
                 Pattern pattern = tpart.getCompiledPattern();

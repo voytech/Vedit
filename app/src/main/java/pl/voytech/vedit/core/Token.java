@@ -10,7 +10,9 @@ import pl.voytech.vedit.core.renderers.core.Renderable;
  */
 
 public class Token extends FeatureHolder implements Renderable,TokenApi{
-
+    public interface StateChangeListener{
+        void onStateChanged(Token t);
+    }
     public enum State{
         EDITING,
         FINISHED
@@ -22,14 +24,19 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
     private int endRow;
     private final UUID id;
     private State state = State.EDITING;
-
+    private StateChangeListener stateChangeListener;
     public Token(){
+        super();
         id = UUID.randomUUID();
     }
     public Token(Cursor c){
         super();
         id = UUID.randomUUID();
         assertStart(c);
+    }
+    public Token(Cursor c,StateChangeListener listener){
+        this(c);
+        this.stateChangeListener = listener;
     }
 
     private void assertStart(Cursor c){
@@ -52,7 +59,7 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
                     .concat(character + "")
                     .concat(value.substring(offset));
         }
-        state = State.EDITING;
+        setState(State.EDITING);
         endColumn = startColumn + value.length()-1;
     }
 
@@ -68,7 +75,7 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
         }
         if (remove) {
             value = value.substring(0, offset - 1).concat(value.substring(offset));
-            state = State.EDITING;
+            setState(State.EDITING);
             endColumn = startColumn + value.length() - 1;
         }
         return result;
@@ -81,7 +88,7 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
             return false;
         }
         value = value.substring(0,offset).concat(value.substring(offset+1));
-        state = State.EDITING;
+        setState(State.EDITING);
         endColumn = startColumn + value.length()-1;
         return true;
     }
@@ -94,13 +101,13 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
         }
         String leftSideVal = value.substring(0,offset);
         String rightSideVal = value.substring(offset);
-        state = State.FINISHED;
+        setState(State.EDITING);
         this.value = leftSideVal;
         endColumn = startColumn + value.length()-1;
-        Token right = new Token(c);
-        right.setState(State.FINISHED);
+        Token right = new Token(c,stateChangeListener);
+        right.setState(State.EDITING);
         right.update(rightSideVal);
-        return  right;
+        return right;
     }
 
     protected void move(int x, int y) {
@@ -113,6 +120,7 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
     public void update(String value) {
         this.value = value;
         endColumn = startColumn + value.length()-1;
+        setState(State.EDITING);
     }
 
     public boolean pointedBy(Cursor c){
@@ -149,15 +157,17 @@ public class Token extends FeatureHolder implements Renderable,TokenApi{
     }
 
     public void setState(State state) {
-        this.state = state;
+        if (this.state != state) {
+            this.state = state;
+            if (stateChangeListener!=null){
+                stateChangeListener.onStateChanged(this);
+            }
+        }
     }
 
     public UUID getId() {
         return id;
     }
-
-
-
 
 
 }
