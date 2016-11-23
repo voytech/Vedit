@@ -48,9 +48,7 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
             return end;
         }
     }
-    interface TokenListener {
-        void stateChanged(Token token);
-    }
+
     public interface TokenVisitor{
         void visit(Token token, int index);
     }
@@ -245,9 +243,12 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
         return false;
     }
 
-    public void delete(Token token){
+    private void tokenCleanup(Token token){
         token.detachFeatures(this);
         ObjectCache.i().remove(token);
+    }
+    public void delete(Token token){
+        tokenCleanup(token);
         int sR = token.getStartRow();
         int eR = token.getEndRow();
         Iterator<Token> tokenSIterator = tokens.get(sR).iterator();
