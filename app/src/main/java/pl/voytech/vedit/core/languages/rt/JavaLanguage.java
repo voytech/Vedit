@@ -53,69 +53,69 @@ public class JavaLanguage {
         ////////////////////////////////////////////////////////////////////
         // Keywords
         ////////////////////////////////////////////////////////////////////
-        def.addLangPart(createKeyword("abstract",new String[]{"abstract-class","abstract-method"}));
-        def.addLangPart(createKeyword("assert",new String[]{""}));
-        def.addLangPart(createKeyword("boolean",new String[]{"primitive-array","primitive-array-init","primitive","primitive-init"}));
-        def.addLangPart(createKeyword("break",new String[]{"",""}));
-        def.addLangPart(createKeyword("byte",new String[]{"byte-arr","byte-arr-init","byte-var","byte-var-init"}));
-        def.addLangPart(createKeyword("case",new String[]{"",""}));
-        def.addLangPart(createKeyword("catch",new String[]{"",""}));
-        def.addLangPart(createKeyword("char",new String[]{"",""}));
-        def.addLangPart(createKeyword("class",new String[]{"",""}));
-        def.addLangPart(createKeyword("const",new String[]{"",""}));
-        def.addLangPart(createKeyword("continue",new String[]{"",""}));
-        def.addLangPart(createKeyword("default",new String[]{"",""}));
-        def.addLangPart(createKeyword("do",new String[]{"",""}));
-        def.addLangPart(createKeyword("double",new String[]{"",""}));
-        def.addLangPart(createKeyword("else",new String[]{"",""}));
-        def.addLangPart(createKeyword("enum",new String[]{"",""}));
-        def.addLangPart(createKeyword("extends",new String[]{"",""}));
-        def.addLangPart(createKeyword("final",new String[]{"",""}));
-        def.addLangPart(createKeyword("finally",new String[]{"",""}));
-        def.addLangPart(createKeyword("float",new String[]{"",""}));
-        def.addLangPart(createKeyword("for",new String[]{"",""}));
-        def.addLangPart(createKeyword("if",new String[]{"",""}));
-        def.addLangPart(createKeyword("goto",new String[]{"",""}));
-        def.addLangPart(createKeyword("implements",new String[]{"",""}));
-        def.addLangPart(createKeyword("import",new String[]{"import-expr"}));
-        def.addLangPart(createKeyword("instanceof",new String[]{"",""}));
-        def.addLangPart(createKeyword("int",new String[]{"",""}));
-        def.addLangPart(createKeyword("interface",new String[]{"",""}));
-        def.addLangPart(createKeyword("long",new String[]{"",""}));
-        def.addLangPart(createKeyword("native",new String[]{"",""}));
-        def.addLangPart(createKeyword("new",new String[]{"",""}));
-        def.addLangPart(createKeyword("package",new String[]{"package-expr"}));
-        def.addLangPart(createKeyword("private",new String[]{"",""}));
-        def.addLangPart(createKeyword("protected",new String[]{"",""}));
-        def.addLangPart(createKeyword("public",new String[]{"",""}));
-        def.addLangPart(createKeyword("return",new String[]{"",""}));
-        def.addLangPart(createKeyword("short",new String[]{"",""}));
-        def.addLangPart(createKeyword("static",new String[]{"",""}));
-        def.addLangPart(createKeyword("strictfp",new String[]{"",""}));
-        def.addLangPart(createKeyword("super",new String[]{"",""}));
-        def.addLangPart(createKeyword("switch",new String[]{"",""}));
-        def.addLangPart(createKeyword("synchronized",new String[]{"",""}));
-        def.addLangPart(createKeyword("this",new String[]{"",""}));
-        def.addLangPart(createKeyword("throw",new String[]{"",""}));
-        def.addLangPart(createKeyword("throws",new String[]{"",""}));
-        def.addLangPart(createKeyword("transient",new String[]{"",""}));
-        def.addLangPart(createKeyword("try",new String[]{"",""}));
-        def.addLangPart(createKeyword("void",new String[]{"",""}));
-        def.addLangPart(createKeyword("volatile",new String[]{"",""}));
-        def.addLangPart(createKeyword("while",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"abstract",new String[]{"abstract-class","abstract-method"}));
+        def.addLangPart(createKeyword(def,"assert",new String[]{""}));
+        def.addLangPart(createKeyword(def,"boolean",new String[]{"primitive-arr","primitive-arr-init","primitive","primitive-init"}));
+        def.addLangPart(createKeyword(def,"break",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"byte",new String[]{"byte-arr","byte-arr-init","byte-var","byte-var-init"}));
+        def.addLangPart(createKeyword(def,"case",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"catch",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"char",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"class",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"const",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"continue",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"default",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"do",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"double",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"else",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"enum",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"extends",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"final",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"finally",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"float",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"for",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"if",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"goto",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"implements",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"import",new String[]{"import-expr"}));
+        def.addLangPart(createKeyword(def,"instanceof",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"int",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"interface",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"long",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"native",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"new",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"package",new String[]{"package-expr"}));
+        def.addLangPart(createKeyword(def,"private",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"protected",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"public",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"return",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"short",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"static",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"strictfp",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"super",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"switch",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"synchronized",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"this",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"throw",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"throws",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"transient",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"try",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"void",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"volatile",new String[]{"",""}));
+        def.addLangPart(createKeyword(def,"while",new String[]{"",""}));
         ////////////////////////////////////////////////////////////////////
         // Separators
         ////////////////////////////////////////////////////////////////////
-        def.addLangPart(createSeparator("[","\\[",new String[]{}));
-        def.addLangPart(createSeparator("]","\\]",new String[]{}));
-        def.addLangPart(createSeparator("(","\\(",new String[]{}));
-        def.addLangPart(createSeparator(")","\\)",new String[]{}));
-        def.addLangPart(withFeature(createSeparator("{","\\{",new String[]{}),"curly-brace-macro"));
-        def.addLangPart(createSeparator("}","\\}",new String[]{}));
-        def.addLangPart(createSeparator(";","\\;",new String[]{}));
-        def.addLangPart(createSeparator(":","\\:",new String[]{}));
-        def.addLangPart(createSeparator(",","\\,",new String[]{}));
-        def.addLangPart(createSeparator(".","\\.",new String[]{}));
+        def.addLangPart(createSeparator(def,"[","\\[",new String[]{}));
+        def.addLangPart(createSeparator(def,"]","\\]",new String[]{}));
+        def.addLangPart(createSeparator(def,"(","\\(",new String[]{}));
+        def.addLangPart(createSeparator(def,")","\\)",new String[]{}));
+        def.addLangPart(withFeature(createSeparator(def,"{","\\{",new String[]{}),"curly-brace-macro"));
+        def.addLangPart(createSeparator(def,"}","\\}",new String[]{}));
+        def.addLangPart(createSeparator(def,";","\\;",new String[]{}));
+        def.addLangPart(createSeparator(def,":","\\:",new String[]{}));
+        def.addLangPart(createSeparator(def,",","\\,",new String[]{}));
+        def.addLangPart(createSeparator(def,".","\\.",new String[]{}));
         def.addLangPart(createIdentifier());
         ////////////////////////////////////////////////////////////////////
         // Language Productions. Forms valid context-free grammar.
@@ -168,7 +168,7 @@ public class JavaLanguage {
         createProduction(def,"primitive-arr-with-modifier",prods4);
         return def;
     }
-    private LangTokenDef createKeyword(String keyword,String[] startsProductions){
+    private LangTokenDef createKeyword(LangDef lang,String keyword,String[] startsProductions){
         LangTokenDef keywordToken = new LangTokenDef();
         keywordToken.setPattern("^"+keyword+"$");
         keywordToken.setId(keyword);
@@ -176,7 +176,7 @@ public class JavaLanguage {
         javaLangFeatures.add(keywordToken,"keyword-highlight");
         return keywordToken;
     }
-    private LangTokenDef createSeparator(String separator,String pattern,String[] startsProductions){
+    private LangTokenDef createSeparator(LangDef lang,String separator,String pattern,String[] startsProductions){
         LangTokenDef separatorToken = new LangTokenDef();
         separatorToken.setPattern("^"+pattern+"$");
         separatorToken.setId(separator);
@@ -189,9 +189,22 @@ public class JavaLanguage {
         ident.setPattern("^([A-Za-z_]+[A-Za-z0-9_]*)$");
         ident.setId("identifier");
         ident.setGroup(LangTokenDef.TokenGroup.IDENTIFIER);
+
         javaLangFeatures.add(ident,"identifier-highlight");
         return ident;
     }
+    private LangTokenDef[] getFirstToken(LangPartDef langPart){
+        LangTokenDef[] tokenDefs = null;
+        if (LangTokenDef.class.isAssignableFrom(langPart.getClass())){
+            return new LangTokenDef[]{(LangTokenDef)langPart};
+        }
+        else if (LangProductionDef.class.isAssignableFrom(langPart.getClass())) {
+            LangProductionDef productionDef = (LangProductionDef)langPart;
+            tokenDefs = productionDef.startingTokens();
+        }
+        return tokenDefs;
+    }
+
     private LangPartDef createProduction(LangDef lang,String name,List<String[]> productions){
         LangProductionDef productionDef = new LangProductionDef();
         productionDef.setId(name);
@@ -199,6 +212,12 @@ public class JavaLanguage {
             List<LangPartDef> defs = new ArrayList<>();
             for (String kw : production){
                 defs.add(lang.getById(kw));
+            }
+            LangTokenDef[] startingTokens = getFirstToken(defs.get(0));
+            if (startingTokens!=null){
+                for (LangTokenDef startingToken : startingTokens) {
+                    startingToken.getStartsProductions().add(productionDef);
+                }
             }
             productionDef.add(defs.toArray(new LangPartDef[]{}));
         }

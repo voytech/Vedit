@@ -2,6 +2,7 @@ package pl.voytech.vedit.core.languages.rt;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -9,6 +10,7 @@ import java.util.UUID;
 import pl.voytech.vedit.core.EditorBuffer;
 import pl.voytech.vedit.core.Token;
 import pl.voytech.vedit.core.features.FeatureFactory;
+import pl.voytech.vedit.core.features.FeatureHolder;
 import pl.voytech.vedit.core.languages.definition.LangDef;
 import pl.voytech.vedit.core.languages.definition.LangPartDef;
 import pl.voytech.vedit.core.languages.definition.LangProductionDef;
@@ -37,20 +39,31 @@ public class LangAnalyzer {
         String content = analyzed.get(token.getId());
         return content.equals(token.getValue());
     }
-    private void analyzeGrammar(LangPartDef tokenDef){
+    private void feature(FeatureHolder holder,LangPartDef def,EditorBuffer buffer){
+        List<String> featureKeys = features.getFeaturesByLangPart(def);
+        for (String key : featureKeys) {
+            FeatureFactory.i().bind(key,holder,buffer);
+        }
+    }
+    private void analyzeGrammar(Token token,LangPartDef tokenDef,EditorBuffer buffer){
         if (LangTokenDef.class.isAssignableFrom(tokenDef.getClass())){
             LangTokenDef langTokenDef = (LangTokenDef)tokenDef;
-            for (MaybeProduction maybeProduction : maybeProductions){
+            Iterator<MaybeProduction> mIterator = maybeProductions.iterator();
+            while (mIterator.hasNext()){
+                MaybeProduction maybeProduction = mIterator.next();
                 if (!maybeProduction.progress(langTokenDef)){
-                    //
+                    mIterator.remove();
                 }
             }
             List<LangProductionDef> productions = langTokenDef.getStartsProductions();
             if (productions.size()>0) {
                 for (LangProductionDef def : productions) {
-                    MaybeProduction mbp = new MaybeProduction(def);
+                    MaybeProduction mbp = new MaybeProduction(def,maybeProductions);
+                    maybeProductions.add(mbp);
                     if (mbp.progress(langTokenDef)) {
-                        maybeProductions.add(mbp);
+                        //
+                        EditorBuffer.Span group = buffer.span(token,token);
+                        buffer.group(group);
                     }
                 }
             }
@@ -70,8 +83,7 @@ public class LangAnalyzer {
             for (String key : featureKeys) {
                 FeatureFactory.i().bind(key,token,buffer);
             }
-            analyzeGrammar(tokenDef);
-            //analyzed.put(token.getId(),token.getValue());
+            analyzeGrammar(token,tokenDef,buffer);
         }else{
             token.detachFeatures(buffer);
         }

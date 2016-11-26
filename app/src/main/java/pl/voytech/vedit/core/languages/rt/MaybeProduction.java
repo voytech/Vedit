@@ -1,8 +1,14 @@
 package pl.voytech.vedit.core.languages.rt;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.android.internal.util.Predicate;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import pl.voytech.vedit.core.GenericReader;
 import pl.voytech.vedit.core.languages.definition.LangPartDef;
 import pl.voytech.vedit.core.languages.definition.LangProductionDef;
 import pl.voytech.vedit.core.languages.definition.LangTokenDef;
@@ -12,56 +18,138 @@ import pl.voytech.vedit.core.languages.definition.LangTokenDef;
  */
 
 public class MaybeProduction {
+    interface ProductionResultListener{
+        void onResult(MaybeProduction production);
+    }
     enum Status{
-        CANCELED,
+        INCORRECT,
         PENDING,
         CORRECT
     }
     private LangProductionDef def;
     private Status status = Status.PENDING;
     private int lastIdx = 0;
-    public MaybeProduction(LangProductionDef def){
+    private final List<UUID> consumedTokens = new ArrayList<>();
+    private final List<MaybeProduction> analysis;
+    private final Map<Integer,MaybeProduction> subLocks = new HashMap<>();
+    private final Map<Integer,Status> subStates = new HashMap<>();
+    private final Map<Integer,Integer> subIndex = new HashMap<>();
+    private List<ProductionResultListener> listeners = new ArrayList<>();
+    public MaybeProduction(LangProductionDef def,List<MaybeProduction> analysis){
         this.def = def;
+        this.analysis = analysis;
     }
 
-    public List<LangPartDef> expand(LangProductionDef productionDef,boolean toStartingToken){
-        List<LangPartDef> expansion = new ArrayList<>();
-        int idx = 0;
-        boolean dontExpand = false;
-        for (LangPartDef lpd : productionDef.getParts()){
-            if (LangProductionDef.class.isAssignableFrom(lpd.getClass())){
-                if (dontExpand){
-                    expansion.add(lpd);
-                }else {
-                    expansion.addAll(expand((LangProductionDef) lpd, toStartingToken));
-                }
-            }else if (LangTokenDef.class.isAssignableFrom(lpd.getClass())){
-                expansion.add(lpd);
-                if (idx == 0 && toStartingToken){
-                    dontExpand = true;
+    private void setStatus(Status status){
+        if (listeners!=null){
+            this.status = status;
+            if (status == Status.CORRECT || status == Status.INCORRECT) {
+                for (ProductionResultListener listener : listeners) {
+                    listener.onResult(this);
                 }
             }
-            idx++;
         }
-        return expansion;
+    }
+
+    public Status getStatus(){
+        return this.status;
+    }
+    private Status subStatus(int i){
+        return this.subStates.get(i);
+    }
+
+    private void setSubStatus(int i,Status status){
+        this.subStates.put(i,status);
+        if (status == Status.CORRECT){
+            setStatus(status);
+        }else if (status == Status.INCORRECT){
+            int subsLen = def.getParts().length;
+            if (subStates.values().size() == subsLen) {
+                boolean incorrect = true;
+                for (Status s : subStates.values()) {
+                    if (s!=Status.INCORRECT){
+                        incorrect = false;
+                        break;
+                    }
+                }
+                if (incorrect){
+                    setStatus(Status.INCORRECT);
+                }
+            }
+        }
+
+    }
+    private boolean skipSub(int i){
+        boolean skip = false;
+        if (subStates.containsKey(i)){
+            skip = (subStates.get(i) == Status.INCORRECT);
+        }
+        return skip;
+    }
+
+    private boolean subAnalysisLock(int i){
+        if (subLocks.containsKey(i)){
+            MaybeProduction lockedBy = subLocks.get(i);
+            if (lockedBy.getStatus() != Status.PENDING) {
+                if (lockedBy.getStatus() == Status.INCORRECT) {
+                    setSubStatus(i, Status.INCORRECT);
+                }
+                subLocks.remove(i);
+                return false;
+            } else {
+                return true;
+            }
+        }else {
+            return false;
+        }
     }
 
     public boolean progress(LangTokenDef langTokenDef){
         boolean passed = false;
-        LangPartDef toComp = def.getParts()[lastIdx];
-        if (!LangTokenDef.class.isAssignableFrom(toComp.getClass())){
-            expand((LangProductionDef)toComp,true);
-        }else {
-            LangTokenDef tokenDef = (LangTokenDef)toComp;
-            if (tokenDef.getId().equals(langTokenDef.getId())){
-                lastIdx++;
-                if (lastIdx == def.getParts().length){
-                    status = Status.CORRECT;
+        LangPartDef[][] productions = def.getParts();
+        for (int i=0;i<productions.length;i++){
+            if (!subAnalysisLock(i)) {
+                if (skipSub(i)){
+                    continue;
                 }
-                passed = true;
+                LangPartDef[] sub = productions[i];
+                LangPartDef toComp = sub[subIndex.get(i)];
+                if (!LangTokenDef.class.isAssignableFrom(toComp.getClass())) {
+                    LangProductionDef productionDef = (LangProductionDef) toComp;
+                    if (langTokenDef.getStartsProductions().contains(productionDef)) {
+                        MaybeProduction mb = new MaybeProduction(productionDef, analysis);
+                        subLocks.put(i, mb);
+                        analysis.add(mb);
+                        if (sub.length - 1 == subIndex.get(i)){
+                            final int ii = i;
+                            mb.addResultListener(new ProductionResultListener() {
+                                @Override
+                                public void onResult(MaybeProduction production) {
+                                    setSubStatus(ii,production.getStatus());
+                                }
+                            });
+                        }
+                    }
+                } else {
+                    LangTokenDef tokenDef = (LangTokenDef) toComp;
+                    if (tokenDef.getId().equals(langTokenDef.getId())) {
+                        if (subIndex.get(i) == sub.length - 1) {
+                            setSubStatus(i,Status.CORRECT);
+                        }
+                        passed = true;
+                    } else {
+                        setSubStatus(i,Status.INCORRECT);
+                    }
+                }
+                subIndex.put(i,subIndex.get(i)+1);
             }
         }
         return passed;
     }
+
+    private void addResultListener(ProductionResultListener listener) {
+        this.listeners.add(listener);
+    }
+
 
 }

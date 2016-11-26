@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import com.android.internal.util.Predicate;
 
+import pl.voytech.vedit.core.features.FeatureHolder;
 import pl.voytech.vedit.core.features.SpanningFeature;
 import pl.voytech.vedit.core.renderers.core.Renderable;
 
@@ -20,7 +21,7 @@ import pl.voytech.vedit.core.renderers.core.Renderable;
 public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
 
 
-    public class Span{
+    public class Span extends FeatureHolder {
         private final Token start;
         private final Token end;
         public Span(Token start,Token end){
@@ -55,7 +56,7 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
     }
     private final Map<Integer,List<Token>> tokens = new HashMap<Integer,List<Token>>();
     private final Map<UUID,Token> tokensById = new HashMap<>();
-    private final Map<Span,List<SpanningFeature>> groupFeatures = new HashMap<>();
+    private final List<Span> groups = new ArrayList<Span>();
     private final EditorState state;
     private Token.StateChangeListener listener;
     private final Comparator<Token> COLUMN_COMPARATOR = new Comparator<Token>() {
@@ -69,20 +70,18 @@ public class EditorBuffer extends CachedObject implements Renderable,EditorApi {
         super();
         this.state = state;
     }
-
-    public void spanFeature(Span span,SpanningFeature feature){
-        if (!groupFeatures.containsKey(span)){
-            groupFeatures.put(span,new ArrayList<SpanningFeature>());
+    public Span span(Token start,Token end){
+        return new Span(start,end);
+    }
+    public void group(Span span){
+        if (!groups.contains(span)){
+            groups.add(span);
         }
-        groupFeatures.get(span).add(feature);
-        ObjectCache.i().add(feature);
     }
 
     public void extendSpan(Span oldSpan,Token newEnd){
-        if (groupFeatures.containsKey(oldSpan)){
-            List<SpanningFeature> features = groupFeatures.get(oldSpan);
-            groupFeatures.remove(oldSpan);
-            groupFeatures.put(new Span(oldSpan.start,newEnd),features);
+        if (groups.contains(oldSpan)){
+            //oldSpan.end = newEnd;
         }
     }
 
