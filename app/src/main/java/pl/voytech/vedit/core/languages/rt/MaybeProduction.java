@@ -51,6 +51,13 @@ public class MaybeProduction {
         }
     }
 
+    private int ensureSubIndex(int i){
+        if (!subIndex.containsKey(i)) {
+            subIndex.put(i, 0);
+        }
+        return subIndex.get(i);
+    }
+
     public Status getStatus(){
         return this.status;
     }
@@ -118,6 +125,7 @@ public class MaybeProduction {
                     continue;
                 }
                 LangPartDef[] sub = productions[i];
+                ensureSubIndex(i);
                 LangPartDef toComp = sub[subIndex.get(i)];
                 if (!LangTokenDef.class.isAssignableFrom(toComp.getClass())) {
                     LangProductionDef productionDef = (LangProductionDef) toComp;

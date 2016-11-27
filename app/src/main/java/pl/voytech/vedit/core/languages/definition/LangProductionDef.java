@@ -38,6 +38,7 @@ public class LangProductionDef extends LangPartDef<TokenProduction,TokenProducti
         return this;
     }
 
+    //TODO This needs to get list of all tokens not only direct tokens. If all or some sub-productions starts with other nested production then need to recursively obtain nested production's starting tokens as they should be considered as starting tokens for this particular production too.
     public LangTokenDef[] startingTokens() {
         List<LangTokenDef> startingTokens = new ArrayList<>();
         for (LangPartDef[] subProds : parts){
