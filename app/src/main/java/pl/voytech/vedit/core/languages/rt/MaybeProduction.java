@@ -29,9 +29,9 @@ public class MaybeProduction {
     private int lastIdx = 0;
     private final List<UUID> consumedTokens = new ArrayList<>();
     private final PendingProductions analysis;
-    private final Map<Integer,MaybeProduction> subLocks = new HashMap<>();
-    private final Map<Integer,Status> subStates = new HashMap<>();
-    private final Map<Integer,Integer> subIndex = new HashMap<>();
+    private final Map<Integer,MaybeProduction> candidatesLocks = new HashMap<>();
+    private final Map<Integer,Status> candidatesStates = new HashMap<>();
+    private final Map<Integer,Integer> candidatesPointer = new HashMap<>();
     private List<ProductionResultListener> listeners = new ArrayList<>();
     public MaybeProduction(LangProductionDef def,PendingProductions analysis){
         this.def = def;
@@ -51,29 +51,31 @@ public class MaybeProduction {
         }
     }
 
-    private int ensureSubIndex(int i){
-        if (!subIndex.containsKey(i)) {
-            subIndex.put(i, 0);
+    private void ensureCandidate(int i){
+        if (!candidatesPointer.containsKey(i)) {
+            candidatesPointer.put(i, 0);
         }
-        return subIndex.get(i);
+        if (!candidatesStates.containsKey(i)) {
+            candidatesStates.put(i, Status.PENDING);
+        }
     }
 
     public Status getStatus(){
         return this.status;
     }
-    private Status subStatus(int i){
-        return this.subStates.get(i);
+    private Status candidateState(int i){
+        return this.candidatesStates.get(i);
     }
 
-    private void setSubStatus(int i,Status status){
-        this.subStates.put(i,status);
+    private void setCandidateState(int i,Status status){
+        this.candidatesStates.put(i,status);
         if (status == Status.CORRECT){
             setStatus(status);
         }else if (status == Status.INCORRECT){
             int subsLen = def.getParts().length;
-            if (subStates.values().size() == subsLen) {
+            if (candidatesStates.values().size() == subsLen) {
                 boolean incorrect = true;
-                for (Status s : subStates.values()) {
+                for (Status s : candidatesStates.values()) {
                     if (s!=Status.INCORRECT){
                         incorrect = false;
                         break;
@@ -86,22 +88,22 @@ public class MaybeProduction {
         }
 
     }
-    private boolean skipSub(int i){
+    private boolean skipCandidate(int i){
         boolean skip = false;
-        if (subStates.containsKey(i)){
-            skip = (subStates.get(i) == Status.INCORRECT);
+        if (candidatesStates.containsKey(i)){
+            skip = (candidatesStates.get(i) == Status.INCORRECT);
         }
         return skip;
     }
 
-    private boolean subAnalysisLock(int i){
-        if (subLocks.containsKey(i)){
-            MaybeProduction lockedBy = subLocks.get(i);
+    private boolean isCandidateLocked(int i){
+        if (candidatesLocks.containsKey(i)){
+            MaybeProduction lockedBy = candidatesLocks.get(i);
             if (lockedBy.getStatus() != Status.PENDING) {
                 if (lockedBy.getStatus() == Status.INCORRECT) {
-                    setSubStatus(i, Status.INCORRECT);
+                    setCandidateState(i, Status.INCORRECT);
                 }
-                subLocks.remove(i);
+                candidatesLocks.remove(i);
                 return false;
             } else {
                 return true;
@@ -120,25 +122,25 @@ public class MaybeProduction {
         }
         LangPartDef[][] productions = def.getParts();
         for (int i=0;i<productions.length;i++){
-            if (!subAnalysisLock(i)) {
-                if (skipSub(i)){
+            if (!isCandidateLocked(i)) {
+                if (skipCandidate(i)){
                     continue;
                 }
                 LangPartDef[] sub = productions[i];
-                ensureSubIndex(i);
-                LangPartDef toComp = sub[subIndex.get(i)];
+                ensureCandidate(i);
+                LangPartDef toComp = sub[candidatesPointer.get(i)];
                 if (!LangTokenDef.class.isAssignableFrom(toComp.getClass())) {
                     LangProductionDef productionDef = (LangProductionDef) toComp;
                     if (langTokenDef.getStartsProductions().contains(productionDef)) {
                         MaybeProduction mb = analysis.getMaybeProduction(token,langTokenDef,productionDef);
                         mb.consume(token,langTokenDef);
-                        subLocks.put(i, mb);
-                        if (sub.length - 1 == subIndex.get(i)){
+                        candidatesLocks.put(i, mb);
+                        if (sub.length - 1 == candidatesPointer.get(i)){
                             final int ii = i;
                             mb.addResultListener(new ProductionResultListener() {
                                 @Override
                                 public void onResult(MaybeProduction production) {
-                                    setSubStatus(ii,production.getStatus());
+                                    setCandidateState(ii,production.getStatus());
                                 }
                             });
                         }
@@ -146,14 +148,14 @@ public class MaybeProduction {
                 } else {
                     LangTokenDef tokenDef = (LangTokenDef) toComp;
                     if (tokenDef.getId().equals(langTokenDef.getId())) {
-                        if (subIndex.get(i) == sub.length - 1) {
-                            setSubStatus(i,Status.CORRECT);
+                        if (candidatesPointer.get(i) == sub.length - 1) {
+                            setCandidateState(i,Status.CORRECT);
                         }
                     } else {
-                        setSubStatus(i,Status.INCORRECT);
+                        setCandidateState(i,Status.INCORRECT);
                     }
                 }
-                subIndex.put(i,subIndex.get(i)+1);
+                candidatesPointer.put(i,candidatesPointer.get(i)+1);
             }
         }
     }
