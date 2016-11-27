@@ -1,14 +1,12 @@
 package pl.voytech.vedit.core.languages.rt;
 
-import com.android.internal.util.Predicate;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import pl.voytech.vedit.core.GenericReader;
+import pl.voytech.vedit.core.Token;
 import pl.voytech.vedit.core.languages.definition.LangPartDef;
 import pl.voytech.vedit.core.languages.definition.LangProductionDef;
 import pl.voytech.vedit.core.languages.definition.LangTokenDef;
@@ -30,16 +28,18 @@ public class MaybeProduction {
     private Status status = Status.PENDING;
     private int lastIdx = 0;
     private final List<UUID> consumedTokens = new ArrayList<>();
-    private final List<MaybeProduction> analysis;
+    private final PendingProductions analysis;
     private final Map<Integer,MaybeProduction> subLocks = new HashMap<>();
     private final Map<Integer,Status> subStates = new HashMap<>();
     private final Map<Integer,Integer> subIndex = new HashMap<>();
     private List<ProductionResultListener> listeners = new ArrayList<>();
-    public MaybeProduction(LangProductionDef def,List<MaybeProduction> analysis){
+    public MaybeProduction(LangProductionDef def,PendingProductions analysis){
         this.def = def;
         this.analysis = analysis;
     }
-
+    public LangProductionDef def(){
+        return def;
+    }
     private void setStatus(Status status){
         if (listeners!=null){
             this.status = status;
@@ -104,8 +104,13 @@ public class MaybeProduction {
         }
     }
 
-    public boolean progress(LangTokenDef langTokenDef){
-        boolean passed = false;
+
+    public void consume(Token token, LangTokenDef langTokenDef){
+        if (!consumedTokens.contains(token.getId())){
+            consumedTokens.add(token.getId());
+        }else {
+            return;
+        }
         LangPartDef[][] productions = def.getParts();
         for (int i=0;i<productions.length;i++){
             if (!subAnalysisLock(i)) {
@@ -117,9 +122,9 @@ public class MaybeProduction {
                 if (!LangTokenDef.class.isAssignableFrom(toComp.getClass())) {
                     LangProductionDef productionDef = (LangProductionDef) toComp;
                     if (langTokenDef.getStartsProductions().contains(productionDef)) {
-                        MaybeProduction mb = new MaybeProduction(productionDef, analysis);
+                        MaybeProduction mb = analysis.getMaybeProduction(token,langTokenDef,productionDef);
+                        mb.consume(token,langTokenDef);
                         subLocks.put(i, mb);
-                        analysis.add(mb);
                         if (sub.length - 1 == subIndex.get(i)){
                             final int ii = i;
                             mb.addResultListener(new ProductionResultListener() {
@@ -136,7 +141,6 @@ public class MaybeProduction {
                         if (subIndex.get(i) == sub.length - 1) {
                             setSubStatus(i,Status.CORRECT);
                         }
-                        passed = true;
                     } else {
                         setSubStatus(i,Status.INCORRECT);
                     }
@@ -144,7 +148,6 @@ public class MaybeProduction {
                 subIndex.put(i,subIndex.get(i)+1);
             }
         }
-        return passed;
     }
 
     private void addResultListener(ProductionResultListener listener) {

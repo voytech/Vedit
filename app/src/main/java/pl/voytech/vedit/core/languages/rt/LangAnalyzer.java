@@ -1,8 +1,6 @@
 package pl.voytech.vedit.core.languages.rt;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -26,7 +24,7 @@ public class LangAnalyzer {
     private LangDef language;
     private LanguageFeatures features;
     private final Map<UUID,String> analyzed = new HashMap<>();
-    private final List<MaybeProduction> maybeProductions = new ArrayList<>();
+    private final PendingProductions analysis = new PendingProductions();
 
     public void setLanguage(LangDef language){
         this.language = language;
@@ -48,23 +46,12 @@ public class LangAnalyzer {
     private void analyzeGrammar(Token token,LangPartDef tokenDef,EditorBuffer buffer){
         if (LangTokenDef.class.isAssignableFrom(tokenDef.getClass())){
             LangTokenDef langTokenDef = (LangTokenDef)tokenDef;
-            Iterator<MaybeProduction> mIterator = maybeProductions.iterator();
-            while (mIterator.hasNext()){
-                MaybeProduction maybeProduction = mIterator.next();
-                if (!maybeProduction.progress(langTokenDef)){
-                    mIterator.remove();
-                }
-            }
+            analysis.consume(token,langTokenDef);
             List<LangProductionDef> productions = langTokenDef.getStartsProductions();
             if (productions.size()>0) {
                 for (LangProductionDef def : productions) {
-                    MaybeProduction mbp = new MaybeProduction(def,maybeProductions);
-                    maybeProductions.add(mbp);
-                    if (mbp.progress(langTokenDef)) {
-                        //
-                        EditorBuffer.Span group = buffer.span(token,token);
-                        buffer.group(group);
-                    }
+                    MaybeProduction mbp = analysis.getMaybeProduction(token,langTokenDef,def);
+                    mbp.consume(token,langTokenDef);
                 }
             }
         }
